@@ -27,13 +27,12 @@ class Product:
         return image_urls
 
     def get_original_price(self):
-        # TODO: get the original price, current code is fetch actual price
         return WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(
-            (By.CSS_SELECTOR, "#ppd .a-price span:nth-child(2)"))).text
+            (By.CSS_SELECTOR, "#corePrice_desktop span.a-price[data-a-strike=\"true\"]"))).text
 
     def get_price(self):
         return WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(
-            (By.CSS_SELECTOR, "#ppd .a-price span:nth-child(2)"))).text
+            (By.CSS_SELECTOR, "#corePrice_desktop span.a-price:not([data-a-strike=\"true\"])"))).text
 
     def get_attributes(self):
         utils.expander_expand(self.driver, '#productOverview_feature_div')
@@ -127,8 +126,12 @@ class Product:
             'customer_reviews': self.get_customer_reviews()
         }
 
+    def get_related_asin(self):
+        return ''
+
     def scrape(self):
         # TODO [Products related to this item ASIN]
+
         self.data = {
             'name': self.get_name(),
             'image_urls': self.get_image_urls(),
@@ -141,6 +144,7 @@ class Product:
                 'summary': self.get_technical_details_summary(),
                 'other': self.get_technical_details_other(),
                 'additional_information': self.get_technical_details_additional_information()
-            }
+            },
+            'related_asin': self.get_related_asin()
         }
         return self.data
