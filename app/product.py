@@ -142,7 +142,7 @@ class Product:
             'rating': self.get_rating(),
             'technical_details': {
                 'summary': self.get_technical_details_summary(),
-                'other': self.get_technical_details_other(),
+                'other': self.get_technical_details_otwher(),
                 'additional_information': self.get_technical_details_additional_information()
             },
             'related_asin': self.get_related_asin()
