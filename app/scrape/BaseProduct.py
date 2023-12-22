@@ -6,12 +6,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-import utils
+from app import utils
 
 
 class Product:
-    def __init__(self, driver: webdriver):
+    def __init__(self, driver: webdriver, link):
         self.driver = driver
+        self.link = link
         self.data = {}
 
     def get_name(self):
@@ -130,6 +131,7 @@ class Product:
         return ''
 
     def scrape(self):
+        self.driver.get(self.link)
         # TODO [Products related to this item ASIN]
 
         self.data = {
@@ -142,9 +144,13 @@ class Product:
             'rating': self.get_rating(),
             'technical_details': {
                 'summary': self.get_technical_details_summary(),
-                'other': self.get_technical_details_otwher(),
+                'other': self.get_technical_details_other(),
                 'additional_information': self.get_technical_details_additional_information()
             },
             'related_asin': self.get_related_asin()
         }
-        return self.data
+        self.store()
+
+    def store(self):
+        print(self.data)
+        # TODO store data

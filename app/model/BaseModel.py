@@ -74,3 +74,7 @@ class BaseModel(DeclarativeBase):
         except exc.IntegrityError as e:
             db.session.rollback()
             return None
+
+    @classmethod
+    def query(cls):
+        return db.session.query(cls)

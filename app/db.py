@@ -26,4 +26,6 @@ class Db:
             ),
             echo=True
         )
+
+
 db = Db()

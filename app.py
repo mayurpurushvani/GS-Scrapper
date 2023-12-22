@@ -11,11 +11,9 @@ from app.scrape.product import Product
 class App:
     def run(self):
         if sys.argv[1] == 'scrape_link':
-            link = Link()
-            link.scrape()
+            Link.scrape()
         elif sys.argv[1] == 'scrape_product':
-            link = Product()
-            link.scrape()
+            Product.scrape()
 
 
 if __name__ == '__main__':
