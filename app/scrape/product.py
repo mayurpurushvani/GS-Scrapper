@@ -1,8 +1,8 @@
 import os
 from concurrent.futures import ThreadPoolExecutor
 
-from app.model.Link import Link as LinkModel
-from app.scrape import BaseProduct
+from app.model.link import Link as LinkModel
+from app.scrape.base_product import BaseProduct
 from app.web_driver import WebDriver
 
 
@@ -15,10 +15,10 @@ class Product:
     @classmethod
     def scrape_product(cls, link):
         with WebDriver() as webdriver:
-            base_product = BaseProduct(webdriver, link.link)
+            base_product = BaseProduct(webdriver, link)
             base_product.scrape()
-        link.is_scraped = 1
-        link.update()
+            link.is_scraped = True
+            link.update()
 
     @classmethod
     def scrape(cls):

@@ -7,9 +7,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from app import utils
+from app.model.product import Product as ProductModel
 
 
-class Product:
+class BaseProduct:
     def __init__(self, driver: webdriver, link):
         self.driver = driver
         self.link = link
@@ -131,9 +132,8 @@ class Product:
         return ''
 
     def scrape(self):
-        self.driver.get(self.link)
+        self.driver.get(self.link.link)
         # TODO [Products related to this item ASIN]
-
         self.data = {
             'name': self.get_name(),
             'image_urls': self.get_image_urls(),
@@ -152,5 +152,4 @@ class Product:
         self.store()
 
     def store(self):
-        print(self.data)
-        # TODO store data
+        ProductModel.bulk_create([self.data])

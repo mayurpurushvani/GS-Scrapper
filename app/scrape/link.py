@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from app.model.Link import Link as LinkModel
+from app.model.link import Link as LinkModel
 from app.web_driver import WebDriver
 
 

@@ -1,6 +1,3 @@
-from datetime import datetime, timezone
-
-import sqlalchemy
 from sqlalchemy.orm import DeclarativeBase
 
 from app.db import db
@@ -8,9 +5,6 @@ from app.db import db
 
 class BaseModel(DeclarativeBase):
     __abstract__ = True
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    created_at = sqlalchemy.Column(sqlalchemy.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
-    updated_at = sqlalchemy.Column(sqlalchemy.DateTime(timezone=True), nullable=True)
 
     def before_save(self, *args, **kwargs):
         pass
@@ -37,7 +31,7 @@ class BaseModel(DeclarativeBase):
 
     def update(self, *args, **kwargs):
         self.before_update(*args, **kwargs)
-        db.session.commit()
+        self.save()
         self.after_update(*args, **kwargs)
 
     def delete(self, commit=True):
