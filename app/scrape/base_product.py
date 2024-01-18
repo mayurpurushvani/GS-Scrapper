@@ -134,21 +134,31 @@ class BaseProduct:
     def scrape(self):
         self.driver.get(self.link.link)
         # TODO [Products related to this item ASIN]
+        # TODO open variant wise product
         self.data = {
+            'sku': self.link.asin,
             'name': self.get_name(),
-            'image_urls': self.get_image_urls(),
-            'original_price': self.get_original_price(),
-            'price': self.get_price(),
-            'attributes': self.get_attributes(),
-            'description': self.get_description(),
-            'rating': self.get_rating(),
-            'technical_details': {
-                'summary': self.get_technical_details_summary(),
-                'other': self.get_technical_details_other(),
-                'additional_information': self.get_technical_details_additional_information()
-            },
-            'related_asin': self.get_related_asin()
+            'description': ','.join(self.get_description()),
+            'sale_price': utils.string_price_to_float(self.get_price()),
+            'regular_price': utils.string_price_to_float(self.get_original_price()),
+            'images': ','.join(self.get_image_urls()),
+            'external_url': self.link.link,
+            # 'attributes': self.get_attributes(),
+            # 'rating': self.get_rating(),
+            # 'technical_details': {
+            #     'summary': self.get_technical_details_summary(),
+            #     'other': self.get_technical_details_other(),
+            #     'additional_information': self.get_technical_details_additional_information()
+            # },
+            # 'related_asin': self.get_related_asin()
         }
+        technical_details = self.get_technical_details_other()
+        weight = utils.get_weight(technical_details)
+        self.data['weight'] = weight
+        dimensions = utils.get_dimensions(technical_details)
+        self.data['length'] = dimensions['length']
+        self.data['width'] = dimensions['width']
+        self.data['height'] = dimensions['height']
         self.store()
 
     def store(self):

@@ -10,7 +10,12 @@ class Product:
 
     @classmethod
     def get_links(cls):
-        return LinkModel.query().filter_by(is_scraped=False).all()
+        query = LinkModel.query()
+        query = query.filter_by(is_scraped=False)
+        limit = int(os.getenv('SCRAPE_PRODUCT_LIMIT', 0))
+        if limit > 0:
+            query = query.limit(limit)
+        return query.all()
 
     @classmethod
     def scrape_product(cls, link):
