@@ -7,8 +7,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from app import utils
-from app.model.product import Product as ProductModel
 from app.model.attribute import Attribute as AttributeModel
+from app.model.product import Product as ProductModel
 
 
 class BaseProduct:
