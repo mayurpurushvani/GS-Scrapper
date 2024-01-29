@@ -1,12 +1,13 @@
 from datetime import datetime, timezone
 
 from sqlalchemy import Column, Integer, String, Boolean, Text, DECIMAL, DateTime
+from sqlalchemy.orm import relationship
 
 from app.model.base_model import BaseModel
 
 
 class Product(BaseModel):
-    __tablename__ = "products"
+    __tablename__ = "product"
     id = Column(Integer, primary_key=True, autoincrement=True)
     sku = Column(String(255), nullable=False)
     name = Column(String(255), nullable=False)

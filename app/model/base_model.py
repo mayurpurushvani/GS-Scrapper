@@ -1,9 +1,11 @@
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.ext.declarative import declarative_base
 
 from app.db import db
 
+Base = declarative_base()
 
-class BaseModel(DeclarativeBase):
+
+class BaseModel(Base):
     __abstract__ = True
 
     def before_save(self, *args, **kwargs):
