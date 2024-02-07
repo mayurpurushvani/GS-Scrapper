@@ -15,7 +15,6 @@ class BaseProduct:
     def __init__(self, driver: webdriver, link):
         self.driver = driver
         self.link = link
-        self.data = {}
 
     def get_name(self):
         return WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, 'productTitle'))).text
@@ -143,6 +142,7 @@ class BaseProduct:
 
         product = ProductModel()
 
+        product.link = self.link
         product.sku = self.link.asin
         product.external_url = self.link.link
 

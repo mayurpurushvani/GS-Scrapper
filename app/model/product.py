@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, Integer, String, Boolean, Text, DECIMAL, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, Text, DECIMAL, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 
 from app.model.base_model import BaseModel
 
@@ -8,7 +9,9 @@ from app.model.base_model import BaseModel
 class Product(BaseModel):
     __tablename__ = "product"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    sku = Column(String(255), nullable=False)
+    link_id = Column(Integer, ForeignKey("link.id"), unique=True, nullable=False)
+    link = relationship("Link", uselist=False, single_parent=True, backref='product')
+    sku = Column(String(255), nullable=False, unique=True)
     name = Column(String(255), nullable=False)
     published = Column(Boolean, default=False)
     visibility_in_catalog = Column(String(255), default='visible')
