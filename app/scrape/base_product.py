@@ -7,6 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from app import utils
+from app.model.attribute import Attribute as AttributeModel
 from app.model.product import Product as ProductModel
 
 
@@ -14,7 +15,6 @@ class BaseProduct:
     def __init__(self, driver: webdriver, link):
         self.driver = driver
         self.link = link
-        self.data = {}
 
     def get_name(self):
         return WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, 'productTitle'))).text
@@ -29,8 +29,12 @@ class BaseProduct:
         return image_urls
 
     def get_original_price(self):
-        return WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(
-            (By.CSS_SELECTOR, "#corePrice_desktop span.a-price[data-a-strike=\"true\"]"))).text
+        try:
+            return WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(
+                (By.CSS_SELECTOR, "#corePrice_desktop span.a-price[data-a-strike=\"true\"]"))).text
+        except:
+            pass
+        return None
 
     def get_price(self):
         return WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(
@@ -135,31 +139,37 @@ class BaseProduct:
         self.driver.get(self.link.link)
         # TODO [Products related to this item ASIN]
         # TODO open variant wise product
-        self.data = {
-            'sku': self.link.asin,
-            'name': self.get_name(),
-            'description': ','.join(self.get_description()),
-            'sale_price': utils.string_price_to_float(self.get_price()),
-            'regular_price': utils.string_price_to_float(self.get_original_price()),
-            'images': ','.join(self.get_image_urls()),
-            'external_url': self.link.link,
-            # 'attributes': self.get_attributes(),
-            # 'rating': self.get_rating(),
-            # 'technical_details': {
-            #     'summary': self.get_technical_details_summary(),
-            #     'other': self.get_technical_details_other(),
-            #     'additional_information': self.get_technical_details_additional_information()
-            # },
-            # 'related_asin': self.get_related_asin()
-        }
-        technical_details = self.get_technical_details_other()
-        weight = utils.get_weight(technical_details)
-        self.data['weight'] = weight
-        dimensions = utils.get_dimensions(technical_details)
-        self.data['length'] = dimensions['length']
-        self.data['width'] = dimensions['width']
-        self.data['height'] = dimensions['height']
-        self.store()
 
-    def store(self):
-        ProductModel.bulk_create([self.data])
+        product = ProductModel()
+
+        product.link = self.link
+        product.sku = self.link.asin
+        product.external_url = self.link.link
+
+        product.name = self.get_name()
+        product.description = ','.join(self.get_description())
+
+        price = self.get_price()
+        product.sale_price = utils.string_price_to_float(price)
+
+        original_price = self.get_original_price()
+        if original_price is None:
+            original_price = price
+        product.regular_price = utils.string_price_to_float(original_price)
+
+        product.images = ','.join(self.get_image_urls())
+
+        technical_details = self.get_technical_details_other()
+        product.weight = utils.get_weight(technical_details)
+
+        dimensions = utils.get_dimensions(technical_details)
+        product.length = dimensions['length']
+        product.width = dimensions['width']
+        product.height = dimensions['height']
+
+        attributes = self.get_attributes()
+        for attribute, value in attributes.items():
+            attribute = attribute.lower().replace(' ', '_')
+            product.attributes.append(AttributeModel(attribute=attribute, value=value))
+
+        product.save()
