@@ -3,6 +3,7 @@ import os
 from datetime import date
 
 from app.model.product import Product as ProductModel
+from app.model.attribute import Attribute as AttributeModel
 
 
 class Product:
@@ -17,17 +18,39 @@ class Product:
             pass
         with open(file_path + file_name, "w", newline="", encoding='utf-8') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=',')
-            csvwriter.writerow(["Type", "SKU", "Name", "Published", "Visibility in catalog", "Short description",
-                                "Description", "In stock?", "Weight (unit)", "Length (unit)", "Width (unit)",
-                                "Height (unit)", "Allow customer reviews?", "Sale price", "Regular price", "Categories",
-                                "Tags", "Images", "External URL", "Button text"])
             products = cls.get_products()
+            finalArray = finalInsertArray = []
+            attributeHeaders = 0
+
+            # Set Data In Excel Array
             for p in products:
-                csvwriter.writerow(['external', p.sku, p.name, p.published, p.visibility_in_catalog,
-                                    p.short_description, p.description, p.in_stock, p.weight, p.length, p.width,
-                                    p.height, p.allow_customer_reviews, p.sale_price, p.regular_price, p.categories,
-                                    p.tags, p.images, p.external_url, "Go To Store"])
+                if len(p.attribute) > attributeHeaders:
+                    attributeHeaders = len(p.attribute)
+
+                finalArray = (["external", p.sku, p.name, p.published, p.visibility_in_catalog,
+                               p.short_description, p.description, p.in_stock, p.weight,
+                               p.length, p.width, p.height, p.allow_customer_reviews,
+                               p.sale_price, p.regular_price, p.categories, p.tags,
+                               p.images, p.external_url, "Go To Store"])
+                for attr in p.attribute:
+                    finalArray += ([attr.attribute, attr.value])
+                finalInsertArray.append(finalArray)
+
+            # Set Header In Excel
+            headers = ["Type", "SKU", "Name", "Published", "Visibility in catalog", "Short description",
+                       "Description", "In stock?", "Weight (unit)", "Length (unit)", "Width (unit)",
+                       "Height (unit)", "Allow customer reviews?", "Sale price", "Regular price", "Categories",
+                       "Tags", "Images", "External URL", "Button text"]
+            if attributeHeaders != 0:
+                for row in range(1, attributeHeaders + 1):
+                    headers.append('Attribute {0} name'.format(row))
+                    headers.append('Attribute {0} value'.format(row))
+            csvwriter.writerow(headers)
+
+            # Set Data In Excel Sheet
+            for data in finalInsertArray:
+                csvwriter.writerow(data)
 
     @classmethod
     def get_products(cls):
-        return ProductModel.query().all()
+        return ProductModel.query().join(AttributeModel, ProductModel.id == AttributeModel.product_id)
