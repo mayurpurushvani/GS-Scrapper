@@ -2,8 +2,8 @@ import csv
 import os
 from datetime import date
 
-from app.model.product import Product as ProductModel
 from app.model.attribute import Attribute as AttributeModel
+from app.model.product import Product as ProductModel
 
 
 class Product:

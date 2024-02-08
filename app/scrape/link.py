@@ -1,9 +1,6 @@
 import os
 
-from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
 
 from app.model.link import Link as LinkModel
 from app.web_driver import WebDriver
@@ -15,18 +12,17 @@ class Link:
     @classmethod
     def scrape(cls):
         with WebDriver() as webdriver:
-            webdriver.get(os.getenv("STARTING_URL"))
+            default_url = os.getenv("STARTING_URL")
+            page_num = int(os.getenv("STARTING_PAGE_NUM"))
             while True:
                 try:
-                    current_page_number = WebDriverWait(webdriver, int(os.getenv('DRIVER_TIMEOUT'))).until(
-                        EC.presence_of_element_located((By.CSS_SELECTOR, 'span.s-pagination-selected'))).text
-                    print(f"Current Page: {current_page_number}")
+                    url = default_url.format(page_num=page_num)
+                    webdriver.get(url)
+                    print(f"Current Page: {page_num}")
                     cls.scrape_page_links(webdriver)
-                    next_page_link = WebDriverWait(webdriver, int(os.getenv('DRIVER_TIMEOUT'))).until(
-                        EC.presence_of_element_located((By.CSS_SELECTOR, 'a.s-pagination-next')))
-                    next_page_link.click()
-                except TimeoutException:
-                    print("Exiting. Last page: " + current_page_number)
+                    page_num += 1
+                except Exception as e:
+                    print(e)
                     break
         cls.store_links()
 
@@ -41,4 +37,4 @@ class Link:
 
     @classmethod
     def store_links(cls):
-        LinkModel.bulk_create(cls.links)
+        LinkModel.bulk_create_with_ignore(cls.links)

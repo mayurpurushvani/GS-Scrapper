@@ -1,3 +1,4 @@
+from sqlalchemy import insert
 from sqlalchemy.ext.declarative import declarative_base
 
 from app.db import db
@@ -62,6 +63,12 @@ class BaseModel(Base):
             db.session.commit()
         cls.after_bulk_create(model_objs, *args, **kwargs)
         return model_objs
+
+    @classmethod
+    def bulk_create_with_ignore(cls, values_list):
+        statement = insert(cls).values(values_list).prefix_with("IGNORE")
+        db.session.execute(statement)
+        db.session.commit()
 
     @classmethod
     def bulk_create_or_none(cls, iterable, *args, **kwargs):
