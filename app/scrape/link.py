@@ -1,5 +1,6 @@
 import os
 
+from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
 
 from app.model.link import Link as LinkModel
@@ -20,7 +21,11 @@ class Link:
                     webdriver.get(url)
                     print(f"Current Page: {page_num}")
                     cls.scrape_page_links(webdriver)
+                    cls.store_links()
                     page_num += 1
+                except TimeoutException as e:
+                    print(e)
+                    break
                 except Exception as e:
                     print(e)
                     break
@@ -38,3 +43,4 @@ class Link:
     @classmethod
     def store_links(cls):
         LinkModel.bulk_create_with_ignore(cls.links)
+        cls.links = []
