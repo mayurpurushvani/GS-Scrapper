@@ -42,5 +42,6 @@ class Link:
 
     @classmethod
     def store_links(cls):
-        LinkModel.bulk_create_with_ignore(cls.links)
-        cls.links = []
+        if len(cls.links) > 0:
+            LinkModel.bulk_create_with_ignore(cls.links)
+            cls.links = []

@@ -27,7 +27,7 @@ class Product(BaseModel):
     regular_price = Column(DECIMAL(10, 2), nullable=False)
     categories = Column(String(255), default=None)
     tags = Column(String(255), default=None)
-    images = Column(String(255), default=None)
+    images = Column(Text, default=None)
     external_url = Column(String(255), default=None)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime(timezone=True), nullable=True)

@@ -1,3 +1,4 @@
+import json
 import re
 from datetime import datetime
 
@@ -20,12 +21,20 @@ class BaseProduct:
         return WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, 'productTitle'))).text
 
     def get_image_urls(self):
-        # TODO: need to capture all image url with all size
         image_urls = []
-        image_url = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(
-            (By.CSS_SELECTOR,
-             "span.a-list-item>span.a-declarative>div.imgTagWrapper>img.a-dynamic-image"))).get_attribute('src')
-        image_urls.append(image_url)
+
+        images_string = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, '//script[contains(., "ImageBlockATF")]'))).get_attribute(
+            'innerText')
+        matches = re.search(r"'colorImages'\s*:\s*{\s*'initial'\s*:\s*([\s\S]+?)\s*}\s*,\s*'colorToAsin'",
+                            images_string)
+        if matches and matches.group(1):
+            images = json.loads(matches.group(1).replace("'", '"'))
+            for image in images:
+                image_url = image.get('hiRes', image.get('large', None))
+                if image_url:
+                    image_urls.append(image_url)
+
         return image_urls
 
     def get_original_price(self):
@@ -147,7 +156,7 @@ class BaseProduct:
         product.external_url = self.link.link
 
         product.name = self.get_name()
-        product.description = ','.join(self.get_description())
+        product.description = '\n'.join(self.get_description())
 
         price = self.get_price()
         product.sale_price = utils.string_price_to_float(price)

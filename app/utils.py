@@ -14,19 +14,22 @@ def expander_expand(driver, expander_selector, text_label='See more'):
 
 def table_to_json(driver, table_selector):
     data = {}
-    rows = WebDriverWait(driver, 10).until(
-        ec.presence_of_all_elements_located((By.CSS_SELECTOR, '{} tr'.format(table_selector))))
-    for row in rows:
-        cols = WebDriverWait(row, 10).until(
-            ec.presence_of_all_elements_located((By.CSS_SELECTOR, 'th, td')))
-        is_key = True
-        key = None
-        for col in cols:
-            if is_key:
-                key = col.text
-                is_key = False
-            elif key is not None:
-                data[key] = col.text
+    try:
+        rows = WebDriverWait(driver, 10).until(
+            ec.presence_of_all_elements_located((By.CSS_SELECTOR, '{} tr'.format(table_selector))))
+        for row in rows:
+            cols = WebDriverWait(row, 10).until(
+                ec.presence_of_all_elements_located((By.CSS_SELECTOR, 'th, td')))
+            is_key = True
+            key = None
+            for col in cols:
+                if is_key:
+                    key = col.text
+                    is_key = False
+                elif key is not None:
+                    data[key] = col.text
+    except:
+        pass
     return data
 
 
@@ -56,6 +59,7 @@ def get_dimensions(technical_details):
     for key, value in technical_details.items():
         if 'Dimensions' in key:
             return decode_dimensions(value)
+    return decode_dimensions('')
 
 
 def decode_dimensions(dimensions_string):

@@ -29,4 +29,8 @@ class Product:
     def scrape(cls):
         links = cls.get_links()
         with ThreadPoolExecutor(max_workers=int(os.getenv('MAX_WORKERS'))) as executor:
-            executor.map(cls.scrape_product, links)
+            for result in executor.map(cls.scrape_product, links):
+                try:
+                    print(result)
+                except Exception as exc:
+                    print(f'Catch inside: {exc}')
