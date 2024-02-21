@@ -58,6 +58,14 @@ class BaseProduct:
         utils.expander_expand(self.driver, '#productOverview_feature_div')
         return utils.ul_li_to_array(self.driver, '#featurebullets_feature_div ul')
 
+    def get_categories(self):
+        try:
+            return WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(
+                (By.XPATH, "//*[@id='wayfinding-breadcrumbs_feature_div']//ul//li[9]//span//a"))).text
+        except:
+            pass
+        return None
+
     def get_technical_details_summary(self):
         return utils.table_to_json(self.driver, '#productDetails_techSpec_section_1')
 
@@ -157,6 +165,10 @@ class BaseProduct:
 
         product.name = self.get_name()
         product.description = '\n'.join(self.get_description())
+
+        product.categories = self.get_categories()
+        if product.categories:
+            product.categories = f'Laptop > {product.categories}'
 
         price = self.get_price()
         product.sale_price = utils.string_price_to_float(price)
