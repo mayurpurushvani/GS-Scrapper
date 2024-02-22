@@ -53,4 +53,4 @@ class Product:
 
     @classmethod
     def get_products(cls):
-        return ProductModel.query().join(AttributeModel, ProductModel.id == AttributeModel.product_id)
+        return ProductModel.query().join(AttributeModel, ProductModel.id == AttributeModel.product_id, isouter=True)
