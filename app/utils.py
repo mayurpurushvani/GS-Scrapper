@@ -43,7 +43,7 @@ def ul_li_to_array(driver, ul_selector):
 
 
 def string_price_to_float(price):
-    return float(price.replace(',', '').replace('$', ''))
+    return float(price.replace(',', '').replace('$', '').replace('\n', '.'))
 
 
 def get_weight(technical_details):

@@ -1,6 +1,7 @@
 import json
 import re
 from datetime import datetime
+import time
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -47,7 +48,7 @@ class BaseProduct:
 
     def get_price(self):
         return WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(
-            (By.CSS_SELECTOR, "#corePrice_desktop span.a-price:not([data-a-strike=\"true\"])"))).text
+            (By.CSS_SELECTOR, "#corePrice_desktop span.a-price:not([data-a-strike=\"true\"]), #corePriceDisplay_desktop_feature_div span.a-price:not([data-a-strike=\"true\"])"))).text
 
     def get_attributes(self):
         utils.expander_expand(self.driver, '#productOverview_feature_div')
@@ -154,6 +155,9 @@ class BaseProduct:
 
     def scrape(self):
         self.driver.get(self.link.link)
+        time.sleep(1)
+        self.driver.execute_script('window.location.reload()')
+
         # TODO [Products related to this item ASIN]
         # TODO open variant wise product
 
