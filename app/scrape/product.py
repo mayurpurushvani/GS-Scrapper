@@ -18,19 +18,22 @@ class Product:
         return query.all()
 
     @classmethod
-    def scrape_product(cls, link):
+    def scrape_product(cls, worker_id, links):
         with WebDriver() as webdriver:
-            base_product = BaseProduct(webdriver, link)
-            base_product.scrape()
-            link.is_scraped = True
-            link.update()
+            for link in links:
+                try:
+                    base_product = BaseProduct(webdriver, link)
+                    base_product.scrape()
+                except Exception as e:
+                    print(f"Worker {worker_id} encountered an exception:", e)
+                link.is_scraped = True
+                link.update()
 
     @classmethod
     def scrape(cls):
+        workers = int(os.getenv('MAX_WORKERS'))
         links = cls.get_links()
-        with ThreadPoolExecutor(max_workers=int(os.getenv('MAX_WORKERS'))) as executor:
-            for result in executor.map(cls.scrape_product, links):
-                try:
-                    print(result)
-                except Exception as exc:
-                    print(f'Catch inside: {exc}')
+        links_per_worker = [links[i::workers] for i in range(workers)]
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            for worker_id, links_for_worker in enumerate(links_per_worker, 1):
+                executor.submit(cls.scrape_product, worker_id, links_for_worker)
