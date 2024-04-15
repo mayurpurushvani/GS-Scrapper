@@ -33,7 +33,7 @@ class Product:
                                p.sale_price, p.regular_price, p.categories, p.tags,
                                p.images, p.external_url, "Go To Store"])
                 for attr in p.attributes:
-                    finalArray += ([attr.attribute.title().replace('_', ' '), attr.value])
+                    finalArray += ([attr.attribute.title().replace('_', ' '), attr.value, 1])
                 finalInsertArray.append(finalArray)
 
             # Set Header In Excel
@@ -45,6 +45,7 @@ class Product:
                 for row in range(1, attributeHeaders + 1):
                     headers.append('Attribute {0} name'.format(row))
                     headers.append('Attribute {0} value(s)'.format(row))
+                    headers.append('Attribute {0} global'.format(row))
             csvwriter.writerow(headers)
 
             # Set Data In Excel Sheet
@@ -53,4 +54,4 @@ class Product:
 
     @classmethod
     def get_products(cls):
-        return ProductModel.query().join(AttributeModel, ProductModel.id == AttributeModel.product_id)
+        return ProductModel.query().join(AttributeModel, ProductModel.id == AttributeModel.product_id, isouter=True)
