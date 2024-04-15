@@ -15,6 +15,9 @@ class Product:
         limit = int(os.getenv('SCRAPE_PRODUCT_LIMIT', 0))
         if limit > 0:
             query = query.limit(limit)
+        offset = int(os.getenv('SCRAPE_PRODUCT_OFFSET', 0))
+        if offset > 0:
+            query = query.offset(offset)
         return query.all()
 
     @classmethod
