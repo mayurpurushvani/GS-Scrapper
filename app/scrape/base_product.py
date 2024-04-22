@@ -47,8 +47,11 @@ class BaseProduct:
         return None
 
     def get_price(self):
-        return WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(
-            (By.CSS_SELECTOR, "#corePrice_desktop span.a-price:not([data-a-strike=\"true\"]), #corePriceDisplay_desktop_feature_div span.a-price:not([data-a-strike=\"true\"])"))).text
+        try:
+            return WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "#corePrice_desktop span.a-price:not([data-a-strike=\"true\"]), #corePriceDisplay_desktop_feature_div span.a-price:not([data-a-strike=\"true\"])"))).text
+        except:
+            pass
+        return None
 
     def get_attributes(self):
         utils.expander_expand(self.driver, '#productOverview_feature_div')
@@ -161,6 +164,15 @@ class BaseProduct:
         # TODO [Products related to this item ASIN]
         # TODO open variant wise product
 
+        price = self.get_price()
+        if price is None:
+            currently_unavailable = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#availability .a-color-success'))).text == 'Currently unavailable.'
+            if currently_unavailable:
+                self.link.reason = 'currently_unavailable'
+            else:
+                self.link.reason = 'price_unavailable'
+            return
+
         product = ProductModel()
 
         product.link = self.link
@@ -174,7 +186,6 @@ class BaseProduct:
         if product.categories:
             product.categories = f'Laptop > {product.categories}'
 
-        price = self.get_price()
         product.sale_price = utils.string_price_to_float(price)
 
         original_price = self.get_original_price()

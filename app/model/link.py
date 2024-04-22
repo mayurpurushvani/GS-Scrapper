@@ -11,5 +11,6 @@ class Link(BaseModel):
     asin = Column(String(255), nullable=False, unique=True)
     link = Column(String(255), nullable=False)
     is_scraped = Column(Boolean(), nullable=False, default=False)
+    reason = Column(String(255), nullable=True)
     created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime(timezone=True), nullable=True)
