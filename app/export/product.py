@@ -19,6 +19,7 @@ class Product:
         with open(file_path + file_name, "w", newline="", encoding='utf-8') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=',')
             products = cls.get_products()
+            print('Done')
             finalArray = finalInsertArray = []
             attributeHeaders = 0
 
@@ -54,4 +55,6 @@ class Product:
 
     @classmethod
     def get_products(cls):
-        return ProductModel.query().join(AttributeModel, ProductModel.id == AttributeModel.product_id, isouter=True)
+        query = ProductModel.query()
+        query.join(AttributeModel, ProductModel.id == AttributeModel.product_id, isouter=True)
+        return query.limit(2000).all()
