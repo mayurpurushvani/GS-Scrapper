@@ -1,12 +1,10 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium_stealth import stealth
-from webdriver_manager.chrome import ChromeDriverManager
 
 
 class WebDriver:
     def __enter__(self):
-        self.webdriver = webdriver.Chrome(options=self.get_options(), service=Service(ChromeDriverManager().install()))
+        self.webdriver = webdriver.Chrome(options=self.get_options())
         stealth(self.webdriver,
                 user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.5481.105 Safari/537.36',
                 languages=['en-US', 'en'],
